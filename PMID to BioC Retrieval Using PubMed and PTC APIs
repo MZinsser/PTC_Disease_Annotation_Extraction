@@ -9,15 +9,25 @@ Created on Thu Oct  3 17:33:31 2019
 #1. Maintain list of PMIDs from PubMed for a specific search query
 #2. Convert that list into a format searchable in PubTator Central (PTC)
 #3. Use PTC API to get annotated articles (right now just 100 but should be able
-#to do up to 1000) for PMID list. Right now in Pubtator Format
-#4. Write data to csv file, then read back in and parse into df
+#to do up to 1000) for PMID list. Right now in XML format
+#4. Repeat that search using a for loop, adding results into table
+    #Used retmax and retstart to ensure I was getting new results incrementally (not same PMIDs over and over)
+#5. Aggregate final df 
+    #Combine rows with same ID, disease, and MESHID into one row, storing a 
+    #count of how many rows were collapsed
 
 
 #To-do:
-#Convert main body of script into a function that can be used to make multiple calls to api
-#Figure out how to search PubMed in "batches"... 
-    #Need to research using "usehistory" and "restart" e-utilities
+#Get ALL the data, perhaps using multiple nested for loops?
 
+#Challenges:
+#Seems that PubTator API Will only let me pull 1000 articles at a time.
+#Possible workaround is to search in batches of 1000. Probably can just split
+#big PMID list into around 12 parts (there are about 12,000 query results for heart
+# failure) and then run my (to be created) parser function 12 different times
+    
+    
+    
 
 
 
@@ -35,28 +45,130 @@ import urllib.parse
 
 
 #Define a search function to get PMIDs from PubMed. Using biopython here:
-#
-def search(query):
-    Entrez.email = 'marleejzinsser@gmail.com'
-    handle = Entrez.esearch(db='pubmed', 
-                            restart = '100',
-                            sort='relevance', 
-                            retmax='100',
-                            usehistory = 'y',
-                            retmode='xml', 
+
+def search(query, search_place):
+    Entrez.email = "marleejzinsser@gmail.com"
+    handle = Entrez.esearch(db="pubmed", 
+                            retstart = search_place,
+                            sort="relevance", 
+                            retmax=100,
+                            retmode="xml", 
                             term=query)
     results = Entrez.read(handle)
     return results
 
-#Use my search function to search for 'heart failure'
-results = search('heart failure')
+columns = ['PMID', 'Delete1', 'Delete2', 'Disease','Delete3', 'MESH']
+main_df = pd.DataFrame(columns = columns)
+
+#Use my search function to search for 'heart failure' multiple times through for loop:
+for x in range (0,5):
+    
+    x = x*100
+    results = search('heart failure', x)
 #Store the PMIDs
 #id_list = results['IdList']
 
-id_list = results['IdList']
+    id_list = results["IdList"]
 #This line gives me a comma-separated list, suitable format for a get call to 
 #PubTator Central API
-ids = ','.join(id_list)
+    ids = ','.join(id_list)
+    
+    
+    #Construct a url from the list of IDs plus the base https components
+    url = "https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/RESTful/tmTool.cgi/Disease/" + ids + "/pubtator/"
+
+
+# Get call that allows me to speciy Disease as type, enter 100-1000 PMIDS,
+# and specify format as BioC, json, or PubMed
+    response = requests.get(url)
+#Print the responses in (currently) Pubtator Format
+#print (response.text.encode("utf-8"))
+
+#convert the Response to a string in Pubtator Format (henceforth ptf)
+    from io import StringIO
+    ptf_str = response.text
+    ptf_str = StringIO(ptf_str)
+
+#Write the ptf string to a csv file
+#    with open ("output.csv", "w")as f:
+#        f.write(ptf_str)
+    
+
+#Read in csv file and convert to df
+    columns = ['PMID', 'Delete1', 'Delete2', 'Disease','Delete3', 'MESH']
+    df = pd.DataFrame(columns = columns)
+    #df = pd.read_csv('output.csv', delimiter = '\t',names = columns)
+    df = pd.read_csv(ptf_str, delimiter = '\t', names = columns)
+
+    
+    main_df = main_df.append(df)
+    
+    
+#    
+#for x in range (19,38):
+#    
+#    x = x*100
+#    results = search('heart failure', x)
+##Store the PMIDs
+##id_list = results['IdList']
+#
+#    id_list = results["IdList"]
+##This line gives me a comma-separated list, suitable format for a get call to 
+##PubTator Central API
+#    ids = ','.join(id_list)
+#    
+#    
+#    #Construct a url from the list of IDs plus the base https components
+#    url = "https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/RESTful/tmTool.cgi/Disease/" + ids + "/pubtator/"
+#
+#
+## Get call that allows me to speciy Disease as type, enter 100-1000 PMIDS,
+## and specify format as BioC, json, or PubMed
+#    response = requests.get(url)
+##Print the responses in (currently) Pubtator Format
+##print (response.text.encode("utf-8"))
+#
+##convert the Response to a string in Pubtator Format (henceforth ptf)
+#    from io import StringIO
+#    ptf_str = response.text
+#    ptf_str = StringIO(ptf_str)
+#
+##Write the ptf string to a csv file
+##    with open ("output.csv", "w")as f:
+##        f.write(ptf_str)
+#    
+#
+##Read in csv file and convert to df
+#    columns = ['PMID', 'Delete1', 'Delete2', 'Disease','Delete3', 'MESH']
+#    df = pd.DataFrame(columns = columns)
+#    #df = pd.read_csv('output.csv', delimiter = '\t',names = columns)
+#    df = pd.read_csv(ptf_str, delimiter = '\t', names = columns)
+#    
+#                 
+#    
+#    main_df = main_df.append(df)
+#    
+    
+    
+#Aggregating
+main_df['Number of Times Annotated'] = 1 
+#Delete unwanted columns
+del main_df ['Delete1']
+del main_df ['Delete2']
+del main_df ['Delete3']
+
+
+aggregation_functions = {'Number of Times Annotated': 'sum', 'PMID':'first', 'MESH':'first', 'Disease':'first'}
+agg_df= main_df.groupby(['PMID', 'MESH']).aggregate(aggregation_functions)
+
+agg_df = agg_df.reset_index(drop=True)
+
+cols = agg_df.columns.tolist()
+cols = cols [1:] + cols [:1]
+agg_df=agg_df[cols]
+
+
+
 
 
 #A few different way to format the "get",I think I will end up using another format that allows me to specify type as "Disease":
@@ -64,35 +176,6 @@ ids = ','.join(id_list)
 response0 = requests.get("https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids=3958000")
 response1 = requests.get("https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids= 31555894,31556034")
 response2 = requests.get("https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids= 29519873,30093543,30030334,28780577,29490935,28754809,29305560,30262636,27048772,29622597,28775102,29440452,28270426,30496744,30311498,27492941,30355727,30467108,29556692,29129702,29940142,30426860,27056969,29657079,31010113,30902185,30867288,30934680,30760547,30641441,30414045,30191481,30515977,30549006,30310926,29791869,29127235,29034473,30514557,30247170,30217578,29544410,29500602,30482191,30474554,30071487,30642654,30205856,29400650,29189081,29063675,29294390,30012423,29766347,30636220,29982937,29980429,29987831,26661320,28359939,30051388,28595547,30989444,30223427,27402805,30227610,30225714,29574800,26438784,28920469,30786071,30357874,30097045,30009777,30047538,29859753,29747223,29160855,28842438,29962876,29935580,29929790,30571359,29679848,29272987,29196133,30884846,27055812,29430653,28635515,29992494,30268703,29538649,30406290,30169913,30404073,29852125,31278142,28574157,30528680")
-
-
-#Construct a url from the list of IDs plus the base https components
-url = "https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/RESTful/tmTool.cgi/Disease/" + ids + "/pubtator/"
-
-
-# Get call that allows me to speciy Disease as type, enter 100-1000 PMIDS,
-# and specify format as BioC, json, or PubMed
-response = requests.get(url)
-#Print the responses in (currently) Pubtator Format
-print (response.text.encode("utf-8"))
-
-#convert the Response to a string in Pubtator Format (henceforth ptf)
-ptf_str = response.text
-
-#Write the ptf string to a csv file
-with open ("output.csv", "w")as f:
-    f.write(ptf_str)
-    
-
-#Read in csv file and convert to df
-columns = ['PMID', 'Delete1', 'Delete2', 'Disease','Delete3', 'MESH']
-df = pd.DataFrame(columns = columns)
-df = pd.read_csv('output.csv', delimiter = '\t',
-                 names = columns)
-#Delete unwanted columns
-del df ['Delete1']
-del df ['Delete2']
-del df ['Delete3']
 
 
 
