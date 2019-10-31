@@ -2,6 +2,19 @@
 # -*- coding: utf-8 -*-
 
 
+#A bit of info about running this and TROUBLESHOOTING CONNECTION ERRORS:
+#On my machine, when I run this in the python console, I get a connection error (errno61). I can't seem to successfully
+#connect to the 7686 port this way. 
+#HOWEVER... It does work if I first open the neo4j desktop, open a project with the same password, and then start that project.
+#Once the project is started, the connection is established, and now I can go back to the script and it will run successfully.
+
+#Obviously there is a problem here where I am not initializing properly, but I can't make sense of it. All sample code I'm finding
+#online connects similarly to how I have below, with no connection initialization step(s). I suspect this code might work
+#right away on another machine, as I've had a history of issues connecting to neo4j in the past. Might be something to do with
+#my own setup installation.
+
+
+
 from py2neo import Graph, Node, Relationship
 
 uri = "bolt://localhost:7687"
