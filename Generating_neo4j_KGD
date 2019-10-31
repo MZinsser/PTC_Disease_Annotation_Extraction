@@ -3,88 +3,42 @@
 
 
 from py2neo import Graph, Node, Relationship
-import csv
-import pandas as pd
-
-df = pd.read_csv("PMID-MESH.csv", delimiter = ',')
 
 uri = "bolt://localhost:7687"
 user = "neo4j"
 password = "pubtator"
 
-g = Graph(uri=uri, user=user, password=password)
+#Not sure if need secure=True
+g = Graph(uri=uri, user=user, password=password, secure = True)
 
 # optionally clear the graph
 g.delete_all()
 
+#Test graph is empty
 print(len(g.nodes))
 print(len(g.relationships))
 
 # begin a transaction
 tx = g.begin()
 
-query = """
 
+#Can write the query in cypher
+query = """
 
 LOAD CSV WITH HEADERS FROM 'file:////Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH.csv' AS line
 WITH line
 WHERE line.PMID IS NOT NULL
 MERGE (pmid:PMID{PMID:line.PMID})
 MERGE (mesh:MESH{MESH:line.MESH})
-MERGE (mesh) -[:is_annotated_in]-> (pmid)
-  ON CREATE SET mesh.times_annotated = line.Number_of_Times_Annotated
-  ON MATCH SET mesh.times_annotated = line.Number_of_Times_Annotated
-"""
+MERGE (disease:Disease{Name:line.Disease})
+MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]-> (pmid)
+MERGE (disease) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]->(pmid)
 
+"""
+#And then use py2neo to run it
 g.run(query)
 
 
-
-
+#Test graph is now populated
 print(len(g.nodes))
 print(len)
-#MERGE (mesh:MESH{Times_Annotated:line.Number_of_Times_Annotated})
-
-#
-#
-## define some nodes and relationships
-#
-#for PMID in df:
-#    c = Node ("PMID")
-#    d 
-#    
-#a = Node("Person", name="Alice")
-#b = Node("Person", name="Bob")
-#ab = Relationship(a, "KNOWS", b)
-#
-##for PMID in PMID
-##Annotation = Relationship()
-#
-## create the nodes and relationships
-#tx.create(a)
-#tx.create(b)
-#tx.create(ab)
-#
-## commit the transaction
-#tx.commit()
-#
-#print(g.exists(ab))
-#print(len(g.nodes))
-#print(len(g.relationships))
-#
-##"""
-##
-##from neo4j import GraphDatabase
-##from py2neo import Graph
-##import csv
-##import pandas as pd
-##
-#df = pd.read_csv("PMID-MESH.csv", delimiter = ',')
-#
-#graph = Graph('http://localhost:7474/')
-#
-#tx = graph.begin()
-#for PMID in df:
-#    tx.append("CREATE (PMID:PMID) RETURN PMID")
-#    
-#    
