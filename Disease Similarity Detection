@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov  7 17:14:06 2019
+
+@author: marleezinsser
+"""
+
+
+
+#To-do:
+#Convert this cypher code into a working python script using py2neo
+#Explore more algorithms, particularly interested in using Overlap algorithm to find hierarchical categories among diseases, but not sure if the data is in a form where this is possible. (
+
+
+
+#Cypher queries:
+
+
+###USING THE JACCARD SIMILARITY ALGORITHM TO FIND SIMILARITY
+#BETWEEN DISEASES
+
+#Return a list of similar diseases
+query = """MATCH (d:Disease)-[:is_annotated_in]->(pmid)
+WITH {item:id(d), categories: collect(id(pmid))} as userData
+WITH collect(userData) as data
+CALL algo.similarity.jaccard.stream(data, {similarityCutoff: 0.0})
+YIELD item1, item2, count1, count2, intersection, similarity
+RETURN algo.asNode(item1).Name AS from, algo.asNode(item2).Name AS to, intersection, similarity
+ORDER BY similarity DESC"""
+
+
+#More interesting:
+#Find the most similar disease for each disease and establish "SIMILAR"
+#relationships among them
+
+query = """
+MATCH (d:Disease)-[:is_annotated_in]->(pmid)
+WITH {item:id(d), categories: collect(id(pmid))} as userData
+WITH collect(userData) as data
+CALL algo.similarity.jaccard(data, {topK: 1, similarityCutoff: 0.1, write:true})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
+
+"""
