@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 22 15:21:41 2019
+
+@author: marleezinsser
+"""
+
+import csv
+import pandas as pd
+
+import API_Wrapper
+
+df1 = get_annotations(1,8, 'heart failure', True, 'PubTator')
+
+df2 = get_annotations (9,20, 'heart failure', True, 'PubTator')
+
+df3 = get_annotations(21, 25, 'heart failure', True, 'PubTator')
+
+df4 = get_annotations(26, 30, 'heart failure', True, 'PubTator')
+
+df5 = get_annotations(31, 37, 'heart failure', True, 'PubTator')
+
+df6 = get_annotations(38, 45, 'heart failure', True, 'PubTator')
+
+df7 = get_annotations(46, 51, 'heart failure', True, 'PubTator')
+
+df8 = get_annotations(52, 60, 'heart failure', True, 'PubTator')
+
+df9 = get_annotations(61, 70, 'heart failure', True, 'PubTator')
+
+df10 = get_annotations(71, 80, 'heart failure', True, 'PubTator')
+
+df11 = get_annotations(81, 90, 'heart failure', True, 'PubTator')
+
+df12 = get_annotations(91, 95, 'heart failure', True, 'PubTator')
+
+df13 = get_annotations(96, 105, 'heart failure', True, 'PubTator')
+
+df14 = get_annotations(106, 112, 'heart failure', True, 'PubTator')
+
+df15 = get_annotations(134, 140, 'heart failure', True, 'PubTator')
+
+df16 = get_annotations(113, 118, 'heart failure', True, 'PubTator')
+
+df17 = get_annotations(119, 126, 'heart failure', True, 'PubTator')
+
+df18 = get_annotations(127, 133, 'heart failure', True, 'PubTator')
+
+df19 = get_annotations(141, 150, 'heart failure', True, 'PubTator')
+
+
+df20 = get_annotations(151, 160, 'heart failure', True, 'PubTator')
+
+df21 = get_annotations(161, 162, 'heart failure', True, 'PubTator')
+
+df22 = get_annotations(163, 167, 'heart failure', True, 'PubTator')
+
+df23 = get_annotations(168, 175, 'heart failure', True, 'PubTator')
+
+df24 = get_annotations(176, 180, 'heart failure', True, 'PubTator')
+
+df25 = get_annotations(181, 190, 'heart failure', True, 'PubTator')
+
+
+df26 = get_annotations(191, 196, 'heart failure', True, 'PubTator')
+
+df27 = get_annotations(197, 205, 'heart failure', True, 'PubTator')
+
+df28 = get_annotations(206, 212, 'heart failure', True, 'PubTator')
+
+df29 = get_annotations(213, 220, 'heart failure', True, 'PubTator')
+
+df30 = get_annotations(221, 225, 'heart failure', True, 'PubTator')
+
+df31 = get_annotations(226, 229, 'heart failure', True, 'PubTator')
+
+df32 = get_annotations(230, 235, 'heart failure', True, 'PubTator')
+
+df33 = get_annotations(236, 240, 'heart failure', True, 'PubTator')
+
+df34 = get_annotations(241, 246, 'heart failure', True, 'PubTator')
+
+df35 = get_annotations(247, 252, 'heart failure', True, 'PubTator')
+
+
+
+
+
+big_df = pd.concat([df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12, df13, df14, df15, df16, df17, df18, df19, df20, df21, df22, df23, df24,
+                    df25, df26, df27, df28, df29, df30, df31, df32, df33, df34, df35
+                    ])
+
+agg_df = aggregate_results(big_df)
+
+
+agg_df.to_csv('/Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH2.csv')
