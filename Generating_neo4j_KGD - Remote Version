@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+
+##Playing around with topK values?
+
+## Can use label propagation algorithm to cluster nodes based on their similari$
+## Create partitions based on the communities the nodes belong to and add 
+#partition property to the disease nodes that identifies the cluster they belon$
+#Then can look at a node, see its community, and ask to see all other nodes in $
+#community
+
+
+from py2neo import Graph, Node, Relationship
+
+uri = "bolt://54.186.76.22:7687"
+user = "neo4j"
+password = "i-0e21a74209008d2cb"
+
+#Not sure if need secure=True
+g = Graph(uri=uri, user=user, password=password, secure = True)
+
+# optionally clear the graph
+g.delete_all()
+
+#Test graph is empty
+print(len(g.nodes))
+print(len(g.relationships))
+
+# begin a transaction
+tx = g.begin()
+
+g.run("CREATE CONSTRAINT ON(mesh:MESH) ASSERT mesh.MESH IS UNIQUE")
+g.run("CREATE CONSTRAINT ON(disease:Disease) ASSERT disease.Name IS UNIQUE")
+
+#Can write the query in cypher
+query = """
+LOAD CSV WITH HEADERS FROM 'file:///Neo4j_CSV_Import.py' AS line
+WITH line
+WHERE line.PMID IS NOT NULL
+MERGE (pmid:PMID{PMID:line.PMID})
+MERGE (mesh:MESH{MESH:line.MESH})
+MERGE (disease:Disease{Name:line.Disease})
+MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}$
+MERGE (disease) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotat$
+
+"""
+#And then use py2neo to run it
+g.run(query)
+
+
+#Test graph is now populated
+print(len(g.nodes))
+print(len)
+
+
+sim_alg = """
+MATCH (d:Disease)-[:is_annotated_in]->(pmid)
+WITH {item:id(d), categories: collect(id(pmid))} as userData
+WITH collect(userData) as data
+CALL algo.similarity.jaccard(data, {topK: 0, similarityCutoff: 0.1, write:true})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min,$
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min$
+
+"""
+
+g.run(sim_alg)
