@@ -11,6 +11,9 @@ import pandas as pd
 
 import API_Wrapper
 
+#Note, in my version of the API_Wrapper, the date range for search is set to 2010 to 2018.
+#This is intended to reduce the number of results we get.
+
 
 df0 = get_annotations(0,1, 'heart failure', True, 'PubTator')
 df1 = get_annotations(1,100, 'heart failure', True, 'PubTator')
@@ -35,6 +38,7 @@ df11 = get_annotations(1000,1010, 'heart failure', True, 'PubTator')
 
 
 #^in total we stop after searching for 101,490 PMIDs
+#Note: We produce a df of over 400,000 rows, because a row is generated for each unique PMID-MESH pair.
 
 
 big_df = pd.concat([df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11])
