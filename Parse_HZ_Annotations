@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 30 13:12:00 2020
+
+@author: marleezinsser
+"""
+
+import xml.etree. ElementTree as ET
+
+tree = ET.parse('HZ_annotations_2019.xml')
+root = tree.getroot()
+
+    
+df_cols = ["PMID", "MESH", "Disease"]
+rows = []
+
+for node in root:
+    PMID = node.attrib.get("id")
+    MESH = node.find("MESH").text
+    Disease = node.find("annotation").text
+    
+    rows.append({"PMID":PMID, "MESH": MESH, "Disease": Disease})
+    
+out_df = pd.DataFrame(rows, columnds = df_cols)
