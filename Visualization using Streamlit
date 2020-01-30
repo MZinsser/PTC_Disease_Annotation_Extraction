@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 30 11:19:48 2020
+
+@author: marleezinsser
+"""
+
+# Just getting streamlit up and running. Neo4j data to be uploaded later.
+#  Local URL: http://localhost:8501
+#  Network URL: http://10.144.180.248:8501
+
+import streamlit as st
+from neo4j import GraphDatabase
+import pandas as pd
+import altair as alt
+import datetime
+from PIL import Image
+
+driver = GraphDatabase.driver("bolt://localhost", auth=("neo4j", "neo"))
+
+st.title("PTC Disease Similarity")
+
+#
+#Fun use of buttons:
+#btn = st.button("Celebrate!")
+#if btn:
+#    st.balloons()
+#    
