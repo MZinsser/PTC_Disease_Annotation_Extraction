@@ -1,4 +1,4 @@
-2 Phases:
+3 Phases:
 
 
 #PTC_DATA_EXTRACTION
@@ -9,3 +9,7 @@ Extract disease data from PubTator Central for a given query (in this case, 'hea
 #DATA->KGD
 
 Use extracted disease annotation data to populate a knowledge graph database using neo4j
+
+#KGD -> VISUALIZATION
+
+Create a visualization of the KGD using Streamlit
