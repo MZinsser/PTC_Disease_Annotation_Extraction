@@ -1,25 +1,46 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 30 13:12:00 2020
+Created on Fri Jan 31 14:19:06 2020
 
 @author: marleezinsser
 """
 
-import xml.etree. ElementTree as ET
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 30 13:12:00 2020
 
+@author: marleezinsser
+"""
+import pandas as pd
+import xml.etree. ElementTree as ET
+#
 tree = ET.parse('HZ_annotations_2019.xml')
 root = tree.getroot()
+doc = ET.parse('HZ_annotations_2019.xml')
 
-    
-df_cols = ["PMID", "MESH", "Disease"]
-rows = []
-
-for node in root:
-    PMID = node.attrib.get("id")
-    MESH = node.find("MESH").text
-    Disease = node.find("annotation").text
-    
-    rows.append({"PMID":PMID, "MESH": MESH, "Disease": Disease})
-    
-out_df = pd.DataFrame(rows, columnds = df_cols)
+data = pd.DataFrame()
+PMIDs = []
+Diseases = []
+MESHIDs = []
+for child in doc.getroot():
+    PMID = child.find('id')
+    if PMID is not None:
+        grandchildren = child.getchildren()
+        for grandchild in grandchildren:
+            Disease=grandchild.find('annotation')
+            if Disease is not None:
+                PMIDs.append(PMID.text)
+                print ((grandchild.find('annotation').find('text')).text)
+                Diseases.append((grandchild.find('annotation').find('text')).text)
+                if grandchild.find('annotation').find('annotation id') is not None:
+                    print ((grandchild.find('annotation').find('text')).text)
+                #MESH = 
+                    MESHIDs.append((grandchild.find('annotation').find('annotation id')))
+    #if PMID is not None:
+        #print (child.find('id'))
+       # print(child.find('id').text)
+        
+data['PMID'] = PMIDs  
+data['Disease']=Diseases
