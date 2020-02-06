@@ -5,14 +5,6 @@ Created on Fri Jan 31 14:19:06 2020
 
 @author: marleezinsser
 """
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 30 13:12:00 2020
-
-@author: marleezinsser
-"""
 import pandas as pd
 import xml.etree. ElementTree as ET
 #
@@ -24,23 +16,45 @@ data = pd.DataFrame()
 PMIDs = []
 Diseases = []
 MESHIDs = []
+
+
+#Extract relevant data from the XML file:
+
 for child in doc.getroot():
     PMID = child.find('id')
     if PMID is not None:
-        grandchildren = child.getchildren()
-        for grandchild in grandchildren:
-            Disease=grandchild.find('annotation')
-            if Disease is not None:
-                PMIDs.append(PMID.text)
-                print ((grandchild.find('annotation').find('text')).text)
-                Diseases.append((grandchild.find('annotation').find('text')).text)
-                if grandchild.find('annotation').find('annotation id') is not None:
-                    print ((grandchild.find('annotation').find('text')).text)
+        print (child.find('id').text)
+        for grandchild in child:
+            for disease in grandchild.findall('annotation'):
+                disease = disease.find('text')
+                if disease is not None:
+                    PMIDs.append(PMID.text)
+                    print(disease.text)
+                    Diseases.append(disease.text)
+                    #print ((grandchild.find('annotation').find('text')).text)
+                    #Diseases.append((grandchild.find('annotation').find('text')).text)
+                 #   if grandchild.find('annotation').find('annotation id') is not None:
+                     #   print ((grandchild.find('annotation').find('text')).text)
                 #MESH = 
-                    MESHIDs.append((grandchild.find('annotation').find('annotation id')))
-    #if PMID is not None:
-        #print (child.find('id'))
-       # print(child.find('id').text)
-        
+               #     MESHIDs.append((grandchild.find('annotation').find('annotation id')))
+
+
+#Put data into df:           
 data['PMID'] = PMIDs  
-data['Disease']=Diseases
+data['Disease']=Diseases       
+data['Number_of_Times_Annotated'] = 1 
+
+#aggregate/cleanup for purpose of uploading to neo4j:
+aggregation_functions = {'Number_of_Times_Annotated': 'sum', 'PMID':'first', 'Disease':'first'}
+data = data.groupby(['PMID', 'Disease']).aggregate(aggregation_functions)
+
+data = data.reset_index(drop=True)
+
+cols = data.columns.tolist()
+cols = cols [1:] + cols [:1]
+data=data[cols]     
+  
+data['Disease'] = data['Disease'].str.lower()
+
+#Write the df into csv file in neo4j import directory
+data.to_csv('/Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-DISEASE-HZ.csv')
