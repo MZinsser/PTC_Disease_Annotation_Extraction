@@ -42,4 +42,13 @@ CALL algo.similarity.jaccard(data, {topK: 1, similarityCutoff: 0.1, write:true})
 YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
 RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
 
+#Next steps
+For each disease, finding "suggested" articles that they should be annotated in...
+#Find the most similar diseases to each disease, and return the articles that the similar diseases are annotated in.
+#In other words, finding the articles that do not yet have that disease annotated, but who have similar terms annotated in them already.
+"""
+MATCH(d:Disease {Name: "kd"})-[:SIMILAR]->(other),
+	(other)-[is_annotated_in]-(pmid)
+WHERE not((d)-[:is_annotated_in]->(pmid))
+RETURN pmid.PMID AS PMID
 """
