@@ -45,10 +45,18 @@ RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min,
 #Next steps
 For each disease, finding "suggested" articles that they should be annotated in...
 #Find the most similar diseases to each disease, and return the articles that the similar diseases are annotated in.
-#In other words, finding the articles that do not yet have that disease annotated, but who have similar terms annotated in them already.
+#In other words, finding the documents that do not yet have that disease annotated, but who have similar terms annotated in them already.
 """
 MATCH(d:Disease {Name: "kd"})-[:SIMILAR]->(other),
-	(other)-[is_annotated_in]-(pmid)
-WHERE not((d)-[:is_annotated_in]->(pmid))
-RETURN pmid.PMID AS PMID
+	(other)-[is_annotated_in]->(pmid:PMID)
+WHERE not((d)-[:is_annotated_in]->(pmid:PMID))
+RETURN pmid.PMID as PMID
 """
+
+#INTERESTING THINGS HAPPENING WITH:
+kd
+arrhythmia
+pulmonary emboli
+
+
+
