@@ -5,14 +5,18 @@ Created on Tue Oct 22 15:21:41 2019
 
 @author: marleezinsser
 """
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 22 15:21:41 2019
+
+@author: marleezinsser
+"""
 
 import csv
 import pandas as pd
 
 import API_Wrapper
-
-#Note, in my version of the API_Wrapper, the date range for search is set to 2010 to 2018.
-#This is intended to reduce the number of results we get.
 
 
 df0 = get_annotations(0,1, 'heart failure', True, 'PubTator')
@@ -34,18 +38,55 @@ df9 = get_annotations(800,900, 'heart failure', True, 'PubTator')
 
 df10 = get_annotations(900,1000, 'heart failure', True, 'PubTator')
 
-df11 = get_annotations(1000,1010, 'heart failure', True, 'PubTator')
+df11 = get_annotations(1000,1100, 'heart failure', True, 'PubTator')
 
 
-#^in total we stop after searching for 101,490 PMIDs
-#Note: We produce a df of over 400,000 rows, because a row is generated for each unique PMID-MESH pair.
+#^in total we stop after searching for 101,153 PMIDs
 
 
-big_df = pd.concat([df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11])
+big_df = pd.concat([df0, df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11])
 
+big_df_no_edits = big_df
+
+
+
+
+#big_df_no_nan [['MESH']] = big_df_no_nan[['MESH']].fillna(value="none")
+big_df_no_nan = big_df_no_edits.dropna()
+
+big_df= big_df_no_nan
 agg_df = aggregate_results(big_df)
 
+##During aggregation, approx. 13,000 nodes that had a NULL MESHid (i.e. annotations
+#for which pubmed did not identify a MESH are removed)
+
+
+big_df.to_csv('/Users/marleezinsser/Desktop/big_df')
+agg_df.to_csv('/Users/marleezinsser/Desktop/agg_df.csv')
+
+batch1 = agg_df.iloc[0:25000, :]
+batch2 = agg_df.iloc[25000:50000, :]
+batch3 = agg_df.iloc[50000:100000, :]
+batch4 = agg_df.iloc[100000:150000, :]
+batch5 = agg_df.iloc[150000:200000, :]
+batch6 = agg_df.iloc[200000:250000, :]
+batch7 = agg_df.iloc[250000:350000, :]
+batch8 = agg_df.iloc[350000:450000, :]
+batch9 = agg_df.iloc[450000:497705, :]
 
 
 
-agg_df.to_csv('/Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH-DISEASE.csv')
+batch1.to_csv('/Users/marleezinsser/Desktop/batch1.csv')
+
+batch2.to_csv('/Users/marleezinsser/Desktop/batch2.csv')
+batch3.to_csv('/Users/marleezinsser/Desktop/batch3.csv')
+batch4.to_csv('/Users/marleezinsser/Desktop/batch4.csv')
+batch5.to_csv('/Users/marleezinsser/Desktop/batch5.csv')
+batch6.to_csv('/Users/marleezinsser/Desktop/batch6.csv')
+batch7.to_csv('/Users/marleezinsser/Desktop/batch7.csv')
+batch8.to_csv('/Users/marleezinsser/Desktop/batch8.csv')
+batch9.to_csv('/Users/marleezinsser/Desktop/batch9.csv')
+
+
+
+
