@@ -11,12 +11,41 @@ Created on Thu Jan 23 11:08:19 2020
 
 import csv
 import pandas as pd
-df = pd.read_csv('/Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH-DISEASE.csv')
+df = pd.read_csv('/Users/marleezinsser/Desktop/agg_df.csv')
+df2 = pd.read_csv('/Users/marleezinsser/Desktop/batch1.csv')
+#df= agg_df
 num_PMID_nodes = df['PMID'].nunique()
 num_MESH_nodes = df['MESH'].nunique()
 num_Disease_nodes = df['Disease'].nunique()
 
+sum_dup_MESH = df.iloc[:,[1,2,4]]
+dfx = sum_dup_MESH.drop_duplicates()
+
 total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 
-#Each row represents 2 relationships
-total_relationships = (len(df.index) ) *2
+
+
+#num null MESHIDs:
+#num_null = df.isnull().sum()
+
+#Each row represents 2 possible relationships, and need to subtract 1 relationship
+#for each "duplicate" MESH relationship (connector duplicated but property of times_annotated
+# is unique, so want the two connections in there for now!)
+
+#What neo4j seems to be doing: when the same mesh -> PMID relationship exists
+#with the SAME property of times annotated (i.e. generated when there are multiple
+#distinct disease annotations with the same MESH, it doesn't create the rel. twice...
+#BUT it DOES cre  ate duplicate relationships when the "num_times_annotated property
+#is unique so need to use this script to find how many duplicates would be created
+# and then calculate the correct num. of relationships if everything is loaded into neo4j
+#properly. Can later delete "none" MESH IDs. (Can't just delete the NULLs bc. this throws
+#an error in neo4j. Perhaps another solution would be to import
+#MESH and Disease separately but this is what I am doing for now since it has been 
+#a huge struggle to get it working........))
+total_relationships = (len(agg_df.index) ) + len (dfx.index)
+
+
+
+
+
+
