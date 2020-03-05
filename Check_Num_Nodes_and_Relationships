@@ -11,6 +11,7 @@ Created on Thu Jan 23 11:08:19 2020
 
 import csv
 import pandas as pd
+from pandas import DataFrame
 df = pd.read_csv('/Users/marleezinsser/Desktop/agg_df.csv')
 df2 = pd.read_csv('/Users/marleezinsser/Desktop/batch1.csv')
 #df= agg_df
@@ -35,7 +36,7 @@ total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #What neo4j seems to be doing: when the same mesh -> PMID relationship exists
 #with the SAME property of times annotated (i.e. generated when there are multiple
 #distinct disease annotations with the same MESH, it doesn't create the rel. twice...
-#BUT it DOES cre  ate duplicate relationships when the "num_times_annotated property
+#BUT it DOES create duplicate relationships when the "num_times_annotated property
 #is unique so need to use this script to find how many duplicates would be created
 # and then calculate the correct num. of relationships if everything is loaded into neo4j
 #properly. Can later delete "none" MESH IDs. (Can't just delete the NULLs bc. this throws
@@ -44,7 +45,61 @@ total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #a huge struggle to get it working........))
 total_relationships = (len(df.index) ) + len (dfx.index)
 
-#total relationships should be 960429, and total nodes 159463, upon initial import.
+
+
+
+#Now for HZ Data:
+
+#This is just for when uploading the HZ data by itself to a fresh df:
+dfHZ = pd.read_csv('/Users/marleezinsser/Desktop/PMID-Disease-HZ.csv')
+
+num_HZ_disease_nodes = dfHZ['Disease'].nunique()
+num_HZ_PMID_nodes = dfHZ['PMID'].nunique()
+
+
+
+
+
+
+
+
+
+
+
+
+
+#The number of nodes created in the larger kb is going to depend on how many were already in the 
+#database from the PTC data
+#So first going to combine the unique nodes from PTC data with Henry's nodes,
+#then see how many duplicates there are.
+dfHZ.drop_duplicates()
+
+PMIDsPTC= df.iloc[:,1]
+PMIDsHZ = dfHZ.iloc[:,1]
+
+PMIDsPTC = PMIDsPTC.drop_duplicates()
+PMIDsHZ = PMIDsHZ.drop_duplicates()
+
+df=df.iloc[:,[1,3,4]]
+dfHZ = dfHZ.iloc[:, [1,2,3]]
+
+PTC_diseases = df.iloc[:,1]
+HZ_diseases = dfHZ.iloc[:,1]
+
+PTC_disease_unique = PTC_diseases.drop_duplicates()
+HZ_diseases_unique = HZ_diseases.drop_duplicates()
+frames = [PTC_disease_unique,HZ_diseases_unique]
+
+result = pd.concat(frames)
+
+result_no_dups = result.drop_duplicates()
+
+num_repeats = (len(result.index) - len (result_no_dups.index))
+
+num_new_HZ_Nodes = (len (HZ_diseases_unique.index) + len (PMIDsHZ)) - num_repeats
+
+num_new_HZ_Relationships = len(dfHZ.index)
+
 
 
 
