@@ -22,7 +22,7 @@ num_Disease_nodes = df['Disease'].nunique()
 sum_dup_MESH = df.iloc[:,[1,2,4]]
 dfx = sum_dup_MESH.drop_duplicates()
 
-total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
+PTC_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 
 
 
@@ -43,7 +43,7 @@ total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #an error in neo4j. Perhaps another solution would be to import
 #MESH and Disease separately but this is what I am doing for now since it has been 
 #a huge struggle to get it working........))
-total_relationships = (len(df.index) ) + len (dfx.index)
+PTC_relationships = (len(df.index) ) + len (dfx.index)
 
 
 
@@ -101,6 +101,5 @@ num_new_HZ_Nodes = (len (HZ_diseases_unique.index) + len (PMIDsHZ)) - num_repeat
 num_new_HZ_Relationships = len(dfHZ.index)
 
 
-
-
-
+total_nodes = PTC_nodes + num_new_HZ_Nodes
+total_relationships = PTC_relationships + num_new_HZ_Relationships
