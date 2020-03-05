@@ -47,6 +47,10 @@ For each disease, finding "suggested" articles that they should be annotated in.
 #Find the most similar diseases to each disease, and return the articles that the similar diseases are annotated in.
 #In other words, finding the documents that do not yet have that disease annotated, but who have similar terms annotated in them already.
 """
+
+
+
+
 MATCH(d:Disease {Name: "kd"})-[:SIMILAR]->(other),
 	(other)-[is_annotated_in]->(pmid:PMID)
 WHERE not((d)-[:is_annotated_in]->(pmid:PMID))
@@ -57,6 +61,32 @@ RETURN pmid.PMID as PMID
 kd
 arrhythmia
 pulmonary emboli
+
+
+------------------------------------------------------------------------------------
+#How I ended up implementing these:
+
+#First find similarity relationships for the entire database. 
+#ENDED UP USING TOPK 100 and cutoff .01, to generate a max of 100 similarity pairs for each disease
+
+query = 
+"""MATCH (d:Disease)-[:is_annotated_in]->(pmid)
+WITH {item:id(d), categories: collect(id(pmid))} as userData
+WITH collect(userData) as data
+CALL algo.similarity.jaccard(data, {topK: 100, similarityCutoff: 0.01, write:true})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
+"""
+
+#Once similarity relationships are established, you can export the similarity relationships for a specific disease to
+#csv with this query:
+query = """
+MATCH (d:Disease {Name:"arrhythmia"})-[sim:SIMILAR]->(n)
+WITH collect(DISTINCT d) AS diseases, collect(DISTINCT n) AS simDiseases, collect(sim) AS simRels
+CALL apoc.export.csv.data(diseases + simDiseases, simRels, "arrhythmia-similar-diseases.csv", {})
+YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+"""
 
 
 
