@@ -44,7 +44,7 @@ total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #a huge struggle to get it working........))
 total_relationships = (len(df.index) ) + len (dfx.index)
 
-
+#total relationships should be 960429, and total nodes 159463, upon initial import.
 
 
 
