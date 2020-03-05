@@ -42,7 +42,7 @@ total_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #an error in neo4j. Perhaps another solution would be to import
 #MESH and Disease separately but this is what I am doing for now since it has been 
 #a huge struggle to get it working........))
-total_relationships = (len(agg_df.index) ) + len (dfx.index)
+total_relationships = (len(df.index) ) + len (dfx.index)
 
 
 
