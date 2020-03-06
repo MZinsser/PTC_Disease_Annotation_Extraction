@@ -6,15 +6,40 @@ Created on Thu Mar  5 13:23:44 2020
 @author: marleezinsser
 """
 
+
 import pandas as pd
-df = pd.read_csv('/Users/marleezinsser/Desktop/arrhythmia-similar-diseases.csv')
+
+#INPUT FILES
+arrhythmia_input_file = '/Users/marleezinsser/Desktop/arrhythmia-similar-diseases.csv'
+heart_failure_input_file = '/Users/marleezinsser/Desktop/heart-failure-similar-diseases.csv'
+coronary_artery_disease_input_file = '/Users/marleezinsser/Desktop/coronary-artery-disease-similar-diseases.csv'
+hfpef_input_file= '/Users/marleezinsser/Desktop/hfpef-similar-diseases.csv'
 
 
-sim_diseases = df['Name']
-sim_diseases = sim_diseases.dropna()
+#OUTPUT FILES
+arrhythmia_output_file = '/Users/marleezinsser/Desktop/arrhythmia_sim_diseases.csv'
+heart_failure_output_file = '/Users/marleezinsser/Desktop/heart_failure_sim_diseases.csv'
+coronary_artery_disease_output_file = '/Users/marleezinsser/Desktop/coronary-artery-disease-sim-diseases.csv'
+hfpef_output_file= '/Users/marleezinsser/Desktop/hfpef-sim-diseases.csv'
 
 
-df_new = pd.DataFrame(columns = ['target_disease', 'sim_diseases'])
-df_new['sim_diseases']=sim_diseases
-df_new['target_disease']='arrhythmia'
+def parse_similarity_results (target, inputfile, outputfile):
 
+    df = pd.read_csv(inputfile)
+
+
+    sim_diseases = df['Name']
+    sim_diseases = sim_diseases.dropna()
+
+
+    df_new = pd.DataFrame(columns = ['target_disease', 'sim_diseases'])
+    df_new['sim_diseases']=sim_diseases
+    df_new['target_disease']=target
+    df_new = df_new.drop(df.index[0])
+    df_new.to_csv(outputfile)
+    return df_new
+
+arrhythmia_parsed = parse_similarity_results ('arrhythmia', arrhythmia_input_file, arrhythmia_output_file)
+heart_failure_parsed = parse_similarity_results ('heart failure', heart_failure_input_file, heart_failure_output_file)
+coronary_artery_disease_parsed = parse_similarity_results('coronary artery disease', coronary_artery_disease_input_file, coronary_artery_disease_output_file)
+hfpef_parsed = parse_similarity_results('hfpef', hfpef_input_file, hfpef_output_file)
