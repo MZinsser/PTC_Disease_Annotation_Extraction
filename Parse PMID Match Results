@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 12 14:19:53 2020
+
+@author: marleezinsser
+"""
+
+### Next time: Look at Bio Entrez's read() or parse() to help get the actual text in a readable format via the API.
+import pandas as pd
+import requests
+
+#INPUT FILES
+arrhythmia_input_file = '/Users/marleezinsser/Desktop/arrhythmia_PMID_matches.csv'
+#heart_failure_input_file = '/Users/marleezinsser/Desktop/heart-failure-similar-diseases.csv'
+#coronary_artery_disease_input_file = '/Users/marleezinsser/Desktop/coronary-artery-disease-similar-diseases.csv'
+#hfpef_input_file= '/Users/marleezinsser/Desktop/hfpef-similar-diseases.csv'
+
+
+def parse_pmid_match_results (inputfile):
+
+    df = pd.read_csv(inputfile)
+
+
+    possible_PMIDs= df['PMID']
+
+
+    df_new = pd.DataFrame(columns = ['possible_PMIDs'])
+    df_new['possible_PMIDs']=possible_PMIDs
+#    df_new['target_disease']=target
+#    df_new = df_new.drop(df.index[0])
+   # df_new.to_csv(outputfile)
+    return df_new
+
+arrhythmia_matched_PMIDs = parse_pmid_match_results(arrhythmia_input_file)
+
+def get_PMID_contents(df):
+    
+    main_df = pd.DataFrame()
+    
+#    strings = [str(integer) for integer in integers]
+#a_string = "".join(strings)
+    
+    id_list = arrhythmia_matched_PMIDs['possible_PMIDs'].tolist()
+    id_strings = [str(integer) for integer in id_list]
+    
+   # url = "https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids=" + ids + "&concepts=disease"
+
+
+    x=0;
+    while(x<200):
+#    for x in range (0, 200):
+    #for x in range (0, len(id_strings)):
+    
+        
+    
+        smaller_id_list = id_strings[x:x+100]
+        ids = ','.join(smaller_id_list)
+        print ("getting articles for: ")
+        print (len(smaller_id_list)," ids")
+    
+        url_2 =  "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=4304705"
+        url3 = "https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/pmcoa.cgi/BioC_xml/17299597/ascii"
+       # url = "https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids=" + ids + "&concepts=disease"
+       # response = requests.get(url)
+        response2 = requests.get(url_2)
+        response3 = requests.get(url3)
+        from io import StringIO
+        ptf_str = response3.text
+        ptf_str = StringIO(ptf_str)
+       # columns = ['PMID', 'Delete1', 'Delete2', 'Disease','Delete3', 'MESH']
+        #df = pd.DataFrame(columns = columns)
+            #df = pd.read_csv('output.csv', delimiter = '\t',names = columns)
+        df = pd.read_csv(ptf_str, delimiter = '\t', names = columns)
+    
+        
+        main_df = main_df.append(df)
+        x=x+100
+       # print(ptf_str)
+       # prin
+    return main_df
+
+
+df = get_PMID_contents(arrhythmia_matched_PMIDs)
+        
+    
+
+
