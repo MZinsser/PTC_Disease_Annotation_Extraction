@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 23 11:08:19 2020
 
-@author: marleezinsser
-"""
 
 # This script gives the number of nodes and the number of relationships that 
 #should be expected in the neo4j db after its initial upload.
@@ -12,9 +6,22 @@ Created on Thu Jan 23 11:08:19 2020
 import csv
 import pandas as pd
 from pandas import DataFrame
-df = pd.read_csv('/Users/marleezinsser/Desktop/agg_df.csv')
-df2 = pd.read_csv('/Users/marleezinsser/Desktop/batch1.csv')
-#df= agg_df
+
+batch1 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch1.csv')
+batch2 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch2.csv')
+batch3 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch3.csv')
+batch4 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch4.csv')
+batch5 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch5.csv')
+batch6 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch6.csv')
+batch7 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch7.csv')
+batch8 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch8.csv')
+batch9 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch9.csv')
+frames = [batch1, batch2, batch3, batch4, batch5, batch6, batch7, batch8, batch9]
+df = pd.concat(frames)
+
+#df1 = pd.read_csv('/Users/marleezinsser/Desktop/agg_df.csv')
+#df2 = pd.read_csv('/Users/marleezinsser/Desktop/batch1.csv')
+
 num_PMID_nodes = df['PMID'].nunique()
 num_MESH_nodes = df['MESH'].nunique()
 num_Disease_nodes = df['Disease'].nunique()
@@ -103,3 +110,6 @@ num_new_HZ_Relationships = len(dfHZ.index)
 
 total_nodes = PTC_nodes + num_new_HZ_Nodes
 total_relationships = PTC_relationships + num_new_HZ_Relationships
+
+#total nodes = 159981
+# total relationships = 961767
