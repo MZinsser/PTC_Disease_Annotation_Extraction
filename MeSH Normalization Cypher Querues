@@ -1,0 +1,6 @@
+## Cypher queries for MeSH Annotation
+
+#Return MeSH candidates for disease 1:1 av conduction flutter based on sim relationships
+MATCH (d:Disease{name: "1:1 av conduction flutter"})-[:SIMILAR]->(other),
+(mesh:MESH)-[:associated_MeSH]->(other)
+RETURN mesh.MESH as MESH
