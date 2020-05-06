@@ -1,5 +1,15 @@
 ## Cypher queries for MeSH Annotation
 
+#Add Associated MeSH Relationships:
+#(Repeat for batches 1-9)
+LOAD CSV WITH HEADERS FROM 'file:///batch1.csv' AS line
+WITH line
+WHERE line.PMID IS NOT NULL
+MERGE (pmid:PMID{PMID:line.PMID})
+MERGE (mesh:MESH{MESH:line.MESH})
+MERGE (disease:Disease{Name:line.Disease})
+MERGE (mesh) -[:associated_MeSH]-> (disease)
+
 #Return MeSH candidates for disease 1:1 av conduction flutter based on sim relationships
 MATCH (d:Disease{name: "1:1 av conduction flutter"})-[:SIMILAR]->(other),
 (mesh:MESH)-[:associated_MeSH]->(other)
