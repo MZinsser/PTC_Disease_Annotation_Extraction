@@ -1,0 +1,21 @@
+#GDS allows you to create graphs as part of a catalogue. These graphs can be specified to contain just a certain
+#set of relationships. This way you do not have to perform a MATCH to grab relevant relationships each time you want
+#to run an algorithm, etc.
+
+#Step 1 is to create a graph with just the annotation relationships, and add to the catalogue.
+CALL gds.graph.create('Annotation_Graph', ['Disease', 'PMID'], 'is_annotated_in');
+
+#Following code streams similarity results using GDS "Node Similarity" alg which is based on Jaccard
+CALL gds.nodeSimilarity.stream('Annotation_Graph')
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).Name AS Disease1, gds.util.asNode(node2).Name AS Disease2, similarity
+ORDER BY similarity DESCENDING, Disease1, Disease2
+
+
+#Following command writes the relationships. GDS introduces (in addition to the graph algo topK param), TopN param. TopK is max
+#of relationships per node, topN is max no. of relationships globally. 
+CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.01, topK:100, topN: 100,
+    writeRelationshipType: 'SIMILAR',
+    writeProperty: 'score'
+})
+YIELD nodesCompared, relationshipsWritten
