@@ -14,7 +14,7 @@ ORDER BY similarity DESCENDING, Disease1, Disease2
 
 #Following command writes the relationships. GDS introduces (in addition to the graph algo topK param), TopN param. TopK is max
 #of relationships per node, topN is max no. of relationships globally. 
-CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.01, topK:100, topN: 100,
+CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.01, topK:100, topN: 0,
     writeRelationshipType: 'SIMILAR',
     writeProperty: 'score'
 })
