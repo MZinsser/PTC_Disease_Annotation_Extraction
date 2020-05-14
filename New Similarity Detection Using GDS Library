@@ -12,9 +12,11 @@ RETURN gds.util.asNode(node1).Name AS Disease1, gds.util.asNode(node2).Name AS D
 ORDER BY similarity DESCENDING, Disease1, Disease2
 
 
+#TopK for MeSH Normalization = 50, TopK for PMID Matches = 10
+
 #Following command writes the relationships. GDS introduces (in addition to the graph algo topK param), TopN param. TopK is max
 #of relationships per node, topN is max no. of relationships globally. 
-CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.01, topK:100, topN: 0,
+CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.05, topK:50, topN: 0,
     writeRelationshipType: 'SIMILAR',
     writeProperty: 'score'
 })
