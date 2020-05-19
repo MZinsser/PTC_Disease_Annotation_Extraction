@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Mar 12 14:19:53 2020
-
 @author: marleezinsser
 """
 from bs4 import BeautifulSoup
 from nltk.stem.snowball import SnowballStemmer
+
+import csv
 
 
 import pandas as pd
 import requests
 import nltk
 #INPUT FILES
-arrhythmia_input_file = '/Users/marleezinsser/Desktop/arrhythmia_PMID_matches.csv'
+#arrhythmia_input_file = '/Users/marleezinsser/Desktop/arrhythmia_PMID_matches.csv'
 #heart_failure_input_file = '/Users/marleezinsser/Desktop/heart-failure-similar-diseases.csv'
 #coronary_artery_disease_input_file = '/Users/marleezinsser/Desktop/coronary-artery-disease-similar-diseases.csv'
-#hfpef_input_file= '/Users/marleezinsser/Desktop/hfpef-similar-diseases.csv'
+hfpef_input_file= '/Users/marleezinsser/Desktop/hfpef_sim_diseases_using_gds.csv'
 
 
 def parse_pmid_match_results (inputfile):
@@ -34,7 +35,7 @@ def parse_pmid_match_results (inputfile):
    # df_new.to_csv(outputfile)
     return df_new
 
-arrhythmia_matched_PMIDs = parse_pmid_match_results(arrhythmia_input_file)
+hfpef_matched_PMIDs = parse_pmid_match_results(hfpef_input_file)
 match_success_list = []
 def evaluate_PMID_matches(df):
     
@@ -43,14 +44,14 @@ def evaluate_PMID_matches(df):
 #    strings = [str(integer) for integer in integers]
 #a_string = "".join(strings)
     
-    id_list = arrhythmia_matched_PMIDs['possible_PMIDs'].tolist()
+    id_list = hfpef_matched_PMIDs['possible_PMIDs'].tolist()
     id_strings = [str(integer) for integer in id_list]
     
    # url = "https://www.ncbi.nlm.nih.gov/research/pubtator-api/publications/export/pubtator?pmids=" + ids + "&concepts=disease"
 
-    match_success_list = []
+    match_list = []
     x=0;
-    while(x<1000):
+    while(x<425):
 #    for x in range (0, 200):
     #for x in range (0, len(id_strings)):
     
@@ -62,7 +63,7 @@ def evaluate_PMID_matches(df):
        # print (len(smaller_id_list)," ids")
        curr_id = id_list[x]
        curr_id = str(curr_id)
-       print("searching for arrhthymia in PMID", x)
+       print("searching for hfpef in PMID", x)
        url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=" + curr_id + "&retmode=text&rettype=abstract"
        response = requests.get(url)
        from io import StringIO
@@ -77,16 +78,19 @@ def evaluate_PMID_matches(df):
        # main_df = main_df.append(df)
        
        print(ptf_str)
-       stemmer = SnowballStemmer("english")
+       #stemmer = SnowballStemmer("english")
        tokens = nltk.word_tokenize(ptf_str)
        for token in tokens:
-           stem = stemmer.stem(token)
-           if (stem == "arrhthym"):
+           #stem = stemmer.stem(token)
+          # if(stem == "hfpef")
+           if (token == "hfpef"):
                print ("match found in doc")
                match_list.append(curr_id)
-           if (stem == "arrhythmia"):
+           if (token == "preserved"):
                print ("match found in doc")
                match_list.append(curr_id)
+             
+               
            #else:
                #print ("no match")
        x= x+1
@@ -94,15 +98,15 @@ def evaluate_PMID_matches(df):
        # prin
     return match_list
 
-match_success_list = evaluate_PMID_matches(arrhythmia_matched_PMIDs)
+match_success_list = evaluate_PMID_matches(hfpef_matched_PMIDs)
 match_list_no_dups = list(dict.fromkeys(match_success_list))
 
 match_list_no_dups.to_csv()
 #ptf_str = get_PMID_contents(arrhythmia_matched_PMIDs)
         
-with open('listfile.txt', 'w') as filehandle:
-    for listitem in match_list_no_dups:
-        filehandle.write('%s\n' % listitem)
+#with open('listfile.txt', 'w') as filehandle:
+   # for listitem in match_list_no_dups:
+      #  filehandle.write('%s\n' % listitem)
     
 
 
