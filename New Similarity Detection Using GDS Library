@@ -12,9 +12,9 @@ RETURN gds.util.asNode(node1).Name AS Disease1, gds.util.asNode(node2).Name AS D
 ORDER BY similarity DESCENDING, Disease1, Disease2
 
 
-#TopK for PMID Matches = 100, simCutoff 0.01
+#TopK for PMID Matches = 100, simCutoff 0.03
 
-CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.01, topK:100, topN: 0,
+CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.03, topK:100, topN: 0,
     writeRelationshipType: 'SIMILAR',
     writeProperty: 'score'
 })
