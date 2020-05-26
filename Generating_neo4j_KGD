@@ -38,8 +38,19 @@ MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]
 MERGE (disease) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]->(pmid)
 
 """
+
+#CHEMICALS:
+"""LOAD CSV WITH HEADERS FROM 'file:///batch1_chem.csv' AS line
+WITH line
+WHERE line.PMID IS NOT NULL
+MERGE (pmid:PMID{PMID:line.PMID})
+MERGE (mesh:MESH{MESH:line.MESH})
+MERGE (drug:Drug{Name:line.Chemical})
+MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]-> (pmid)
+MERGE (drug) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]->(pmid)
 #And then use py2neo to run it
 g.run(query)
+"""
 
 
 #Test graph is now populated
