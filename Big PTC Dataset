@@ -1,87 +1,142 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Oct 22 15:21:41 2019
+Created on Fri May 22 17:58:52 2020
 
 @author: marleezinsser
 """
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct 22 15:21:41 2019
 
 @author: marleezinsser
+
+
 """
+
 
 import csv
 import pandas as pd
 
-import API_Wrapper
+import API_Wrapper as wrap
 
 
-#In 11 search batches, use the get_annotations function I defined in API_Wrapper to retrieve annotations
-#from PTC in a table with three columns: PMID, MESH, Disease
-df0 = get_annotations(0,1, 'heart failure', True, 'PubTator')
-df1 = get_annotations(1,100, 'heart failure', True, 'PubTator')
-df2 = get_annotations (100,200, 'heart failure', True, 'PubTator')
-df3 = get_annotations (200, 300, 'heart failure', True, 'PubTator')
-df4 = get_annotations(300,400, 'heart failure', True, 'PubTator')
-df5 = get_annotations(400,500, 'heart failure', True, 'PubTator')
-df6 = get_annotations(500,600, 'heart failure', True, 'PubTator')
-df7 = get_annotations(600,700, 'heart failure', True, 'PubTator')
-df8 = get_annotations(700,800, 'heart failure', True, 'PubTator')
-df9 = get_annotations(800,900, 'heart failure', True, 'PubTator')
-df10 = get_annotations(900,1000, 'heart failure', True, 'PubTator')
-df11 = get_annotations(1000,1100, 'heart failure', True, 'PubTator')
+
+##GETTING DISEASE ANNOTATIONS:
+df0 = wrap.get_annotations(0,1, 'heart failure', True, 'PubTator', 'disease')
+df1 = wrap.get_annotations(1,100, 'heart failure', True, 'PubTator', 'disease')
+df2 = wrap.get_annotations (100,200, 'heart failure', True, 'PubTator', 'disease')
+df3 = wrap.get_annotations (200, 300, 'heart failure', True, 'PubTator', 'disease')
+df4 = wrap.get_annotations(300,400, 'heart failure', True, 'PubTator', 'disease')
+df5 = wrap.get_annotations(400,500, 'heart failure', True, 'PubTator', 'disease')
+df6 = wrap.get_annotations(500,600, 'heart failure', True, 'PubTator', 'disease')
+df7 = wrap.get_annotations(600,700, 'heart failure', True, 'PubTator', 'disease')
+df8 = wrap.get_annotations(700,800, 'heart failure', True, 'PubTator', 'disease')
+df9 = wrap.get_annotations(800,900, 'heart failure', True, 'PubTator', 'disease')
+df10 = wrap.get_annotations(900,1000, 'heart failure', True, 'PubTator', 'disease')
+df11 = wrap.get_annotations(1000,1100, 'heart failure', True, 'PubTator', 'disease')
+df12 = wrap.get_annotations(1100,1200, 'heart failure', True, 'PubTator', 'disease')
+
+
+big_df_disease = pd.concat([df0, df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12])
+
+big_df_no_edits_disease = big_df_disease
+
+big_df_no_nan_disease = big_df_no_edits_disease.dropna()
+
+big_df_disease= big_df_no_nan_disease
+agg_df_disease = wrap.aggregate_results(big_df_disease)
+
+batch1_disease = agg_df.iloc[0:25000, :]
+batch2_disease = agg_df.iloc[25000:50000, :]
+batch3_disease = agg_df.iloc[50000:100000, :]
+batch4_disease = agg_df.iloc[100000:150000, :]
+batch5_disease = agg_df.iloc[150000:200000, :]
+batch6_disease = agg_df.iloc[200000:250000, :]
+batch7_disease = agg_df.iloc[250000:350000, :]
+batch8_disease = agg_df.iloc[350000:450000, :]
+batch9_disease = agg_df.iloc[450000:50000, :]
+batch10_disease = agg_df.iloc[500000:550000, :]
+batch11_disease = agg_df.iloc[550000:600000, :]
+
+batch1_disease.to_csv('/Users/marleezinsser/Desktop/batch1_dis.csv')
+batch2_disease.to_csv('/Users/marleezinsser/Desktop/batch2_dis.csv')
+batch3_disease.to_csv('/Users/marleezinsser/Desktop/batch3_dis.csv')
+batch4_disease.to_csv('/Users/marleezinsser/Desktop/batch4_dis.csv')
+batch5_disease.to_csv('/Users/marleezinsser/Desktop/batch5_dis.csv')
+batch6_disease.to_csv('/Users/marleezinsser/Desktop/batch6_dis.csv')
+batch7_disease.to_csv('/Users/marleezinsser/Desktop/batch7_dis.csv')
+batch8_disease.to_csv('/Users/marleezinsser/Desktop/batch8_dis.csv')
+batch9_disease.to_csv('/Users/marleezinsser/Desktop/batch9_dis.csv')
+batch10_disease.to_csv('/Users/marleezinsser/Desktop/batch10_dis.csv')
+batch11_disease.to_csv('/Users/marleezinsser/Desktop/batch11_dis.csv')
+
+
+
+##GETTING CHEMICAL ANNOTATIONS:
+
+df0_chem = wrap.get_annotations(0,1, 'heart failure', True, 'PubTator', 'chemical')
+df1_chem = wrap.get_annotations(1,100, 'heart failure', True, 'PubTator', 'chemical')
+df2_chem = wrap.get_annotations (100,200, 'heart failure', True, 'PubTator','chemical')
+df3_chem = wrap.get_annotations (200, 300, 'heart failure', True, 'PubTator','chemical')
+
+
+df4_chem = wrap.get_annotations(300,400, 'heart failure', True, 'PubTator', 'chemical')
+df5_chem = wrap.get_annotations(400,500, 'heart failure', True, 'PubTator', 'chemical')
+df6_chem = wrap.get_annotations(500,600, 'heart failure', True, 'PubTator', 'chemical')
+df7_chem = wrap.get_annotations(600,700, 'heart failure', True, 'PubTator', 'chemical')
+
+df8_chem = wrap.get_annotations(700,800, 'heart failure', True, 'PubTator', 'chemical')
+df9_chem = wrap.get_annotations(800,900, 'heart failure', True, 'PubTator', 'chemical')
+df10_chem = wrap.get_annotations(900,1000, 'heart failure', True, 'PubTator', 'chemical')
+df11_chem = wrap.get_annotations(1000,1100, 'heart failure', True, 'PubTator', 'chemical')
+df12_chem = wrap.get_annotations(1100,1200, 'heart failure', True, 'PubTator', 'chemical')
 
 
 #^in total we stop after searching for 101,153 PMIDs
 
-#Combine the dfs:
-big_df = pd.concat([df0, df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11])
-#Save a version prior to edits
-big_df_no_edits = big_df
 
-#drop na values (occurs bc some disease annotations do not have match MESH IDs)
-big_df_no_nan = big_df_no_edits.dropna()
+big_df_chem = pd.concat([df0_chem, df1_chem, df2_chem, df3_chem, df4_chem, df5_chem, df6_chem, df7_chem, df8_chem, df9_chem, df10_chem, df11_chem, df12_chem])
 
-big_df= big_df_no_nan
-agg_df = aggregate_results(big_df)
 
-##During aggregation, approx. 13,000 nodes that had a NULL MESHid (i.e. annotations
-#for which pubmed did not identify a MESH are removed)
+big_df_no_edits_chem = big_df_chem
+
+
+
+
+
+
+big_df_no_nan_chem = big_df_no_edits_chem.dropna()
+
+big_df_chem= big_df_no_nan_chem
+agg_df_chem = wrap.aggregate_results(big_df_chem)
+
+
+agg_df_chem = big_df_chem.rename(columns={"Disease":"Chemical"})
+
 
 
 #big_df.to_csv('/Users/marleezinsser/Desktop/big_df')
 #agg_df.to_csv('/Users/marleezinsser/Desktop/agg_df.csv')
 
-#Break up the large df into even batches. This is better if you know you are going to import to neo4j,
-#bc. neo4j will throw eager operator errors, run out of memory, refuse to periodic commit, and give all sorts of
-#issues when you are trying to import a large df.
-
-batch1 = agg_df.iloc[0:25000, :]
-batch2 = agg_df.iloc[25000:50000, :]
-batch3 = agg_df.iloc[50000:100000, :]
-batch4 = agg_df.iloc[100000:150000, :]
-batch5 = agg_df.iloc[150000:200000, :]
-batch6 = agg_df.iloc[200000:250000, :]
-batch7 = agg_df.iloc[250000:350000, :]
-batch8 = agg_df.iloc[350000:450000, :]
-batch9 = agg_df.iloc[450000:497705, :]
+batch1_chem = agg_df_chem.iloc[0:25000, :]
+batch2_chem = agg_df_chem.iloc[25000:50000, :]
+batch3_chem = agg_df_chem.iloc[50000:100000, :]
+batch4_chem = agg_df_chem.iloc[100000:150000, :]
+batch5_chem = agg_df_chem.iloc[150000:200000, :]
+batch6_chem = agg_df_chem.iloc[200000:250000, :]
 
 
-#These df "batches" are exported to my desktop. I will later move
-#them into the import folder of my neo4j graph db, so I can
-#import them to neo4j
-batch1.to_csv('/Users/marleezinsser/Desktop/batch1.csv')
-batch2.to_csv('/Users/marleezinsser/Desktop/batch2.csv')
-batch3.to_csv('/Users/marleezinsser/Desktop/batch3.csv')
-batch4.to_csv('/Users/marleezinsser/Desktop/batch4.csv')
-batch5.to_csv('/Users/marleezinsser/Desktop/batch5.csv')
-batch6.to_csv('/Users/marleezinsser/Desktop/batch6.csv')
-batch7.to_csv('/Users/marleezinsser/Desktop/batch7.csv')
-batch8.to_csv('/Users/marleezinsser/Desktop/batch8.csv')
-batch9.to_csv('/Users/marleezinsser/Desktop/batch9.csv')
+
+batch1_chem.to_csv('/Users/marleezinsser/Desktop/batch1_chem.csv')
+
+batch2_chem.to_csv('/Users/marleezinsser/Desktop/batch2_chem.csv')
+batch3_chem.to_csv('/Users/marleezinsser/Desktop/batch3_chem.csv')
+batch4_chem.to_csv('/Users/marleezinsser/Desktop/batch4_chem.csv')
+batch5_chem.to_csv('/Users/marleezinsser/Desktop/batch5_chem.csv')
+batch6_chem.to_csv('/Users/marleezinsser/Desktop/batch6_chem.csv')
 
 
 
