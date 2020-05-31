@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 22 17:58:52 2020
-
-@author: marleezinsser
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Created on Tue Oct 22 15:21:41 2019
 
 @author: marleezinsser
-
 
 """
 
 
 import csv
 import pandas as pd
-
 import API_Wrapper as wrap
 
 
@@ -41,11 +31,8 @@ df12 = wrap.get_annotations(1100,1200, 'heart failure', True, 'PubTator', 'disea
 
 
 big_df_disease = pd.concat([df0, df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12])
-
 big_df_no_edits_disease = big_df_disease
-
 big_df_no_nan_disease = big_df_no_edits_disease.dropna()
-
 big_df_disease= big_df_no_nan_disease
 agg_df_disease = wrap.aggregate_results(big_df_disease)
 
@@ -76,44 +63,22 @@ batch11_disease.to_csv('/Users/marleezinsser/Desktop/batch11_dis.csv')
 
 
 ##GETTING CHEMICAL ANNOTATIONS:
-
 df0_chem = wrap.get_annotations(0,1, 'heart failure', True, 'PubTator', 'chemical')
 df1_chem = wrap.get_annotations(1,100, 'heart failure', True, 'PubTator', 'chemical')
 df2_chem = wrap.get_annotations (100,200, 'heart failure', True, 'PubTator','chemical')
 df3_chem = wrap.get_annotations (200, 300, 'heart failure', True, 'PubTator','chemical')
-
-
 df4_chem = wrap.get_annotations(300,400, 'heart failure', True, 'PubTator', 'chemical')
 df5_chem = wrap.get_annotations(400,500, 'heart failure', True, 'PubTator', 'chemical')
 df6_chem = wrap.get_annotations(500,600, 'heart failure', True, 'PubTator', 'chemical')
-df7_chem = wrap.get_annotations(600,700, 'heart failure', True, 'PubTator', 'chemical')
-
-df8_chem = wrap.get_annotations(700,800, 'heart failure', True, 'PubTator', 'chemical')
-df9_chem = wrap.get_annotations(800,900, 'heart failure', True, 'PubTator', 'chemical')
-df10_chem = wrap.get_annotations(900,1000, 'heart failure', True, 'PubTator', 'chemical')
-df11_chem = wrap.get_annotations(1000,1100, 'heart failure', True, 'PubTator', 'chemical')
-df12_chem = wrap.get_annotations(1100,1200, 'heart failure', True, 'PubTator', 'chemical')
-
 
 #^in total we stop after searching for 101,153 PMIDs
 
 
-big_df_chem = pd.concat([df0_chem, df1_chem, df2_chem, df3_chem, df4_chem, df5_chem, df6_chem, df7_chem, df8_chem, df9_chem, df10_chem, df11_chem, df12_chem])
-
-
+big_df_chem = pd.concat([df0_chem, df1_chem, df2_chem, df3_chem, df4_chem, df5_chem, df6_chem])
 big_df_no_edits_chem = big_df_chem
-
-
-
-
-
-
 big_df_no_nan_chem = big_df_no_edits_chem.dropna()
-
 big_df_chem= big_df_no_nan_chem
 agg_df_chem = wrap.aggregate_results(big_df_chem)
-
-
 agg_df_chem = big_df_chem.rename(columns={"Disease":"Chemical"})
 
 
@@ -131,7 +96,6 @@ batch6_chem = agg_df_chem.iloc[200000:250000, :]
 
 
 batch1_chem.to_csv('/Users/marleezinsser/Desktop/batch1_chem.csv')
-
 batch2_chem.to_csv('/Users/marleezinsser/Desktop/batch2_chem.csv')
 batch3_chem.to_csv('/Users/marleezinsser/Desktop/batch3_chem.csv')
 batch4_chem.to_csv('/Users/marleezinsser/Desktop/batch4_chem.csv')
