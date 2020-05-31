@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 from pandas import DataFrame
 
+# Read in the batches from neo4j import directory
 batch1 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch1.csv')
 batch2 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch2.csv')
 batch3 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch3.csv')
@@ -18,9 +19,6 @@ batch8 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Des
 batch9 = pd.read_csv('/Users/marleezinsser/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-9561e750-6489-490b-a464-8401345607cf/installation-3.5.6/import/batch9.csv')
 frames = [batch1, batch2, batch3, batch4, batch5, batch6, batch7, batch8, batch9]
 df = pd.concat(frames)
-
-#df1 = pd.read_csv('/Users/marleezinsser/Desktop/agg_df.csv')
-#df2 = pd.read_csv('/Users/marleezinsser/Desktop/batch1.csv')
 
 num_PMID_nodes = df['PMID'].nunique()
 num_MESH_nodes = df['MESH'].nunique()
@@ -47,17 +45,14 @@ PTC_nodes = num_PMID_nodes + num_MESH_nodes + num_Disease_nodes
 #is unique so need to use this script to find how many duplicates would be created
 # and then calculate the correct num. of relationships if everything is loaded into neo4j
 #properly. Can later delete "none" MESH IDs. (Can't just delete the NULLs bc. this throws
-#an error in neo4j. Perhaps another solution would be to import
-#MESH and Disease separately but this is what I am doing for now since it has been 
-#a huge struggle to get it working........))
+#an error in neo4j.)
+
 PTC_relationships = (len(df.index) ) + len (dfx.index)
-
-
 
 
 #Now for HZ Data:
 
-#This is just for when uploading the HZ data by itself to a fresh df:
+#This is just for when uploading the HZ data by itself to a fresh graph:
 dfHZ = pd.read_csv('/Users/marleezinsser/Desktop/PMID-Disease-HZ.csv')
 
 num_HZ_disease_nodes = dfHZ['Disease'].nunique()
@@ -65,20 +60,11 @@ num_HZ_PMID_nodes = dfHZ['PMID'].nunique()
 
 
 
-
-
-
-
-
-
-
-
-
-
 #The number of nodes created in the larger kb is going to depend on how many were already in the 
 #database from the PTC data
 #So first going to combine the unique nodes from PTC data with Henry's nodes,
 #then see how many duplicates there are.
+
 dfHZ.drop_duplicates()
 
 PMIDsPTC= df.iloc[:,1]
