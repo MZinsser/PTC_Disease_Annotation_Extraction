@@ -1,92 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov  7 17:14:06 2019
+#GDS allows you to create graphs as part of a catalogue. These graphs can be specified to contain just a certain
+#set of relationships. This way you do not have to perform a MATCH to grab relevant relationships each time you want
+#to run an algorithm, etc.
 
-@author: marleezinsser
-"""
+#Step 1 is to create a graph with just the annotation relationships, and add to the catalogue.
+CALL gds.graph.create('Annotation_Graph', ['Disease', 'Chemical','PMID'], 'is_annotated_in');
 
-
-
-#To-do:
-#Convert this cypher code into a working python script using py2neo
-#Explore more algorithms, particularly interested in using Overlap algorithm to find hierarchical categories among diseases, but not sure if the data is in a form where this is possible. (
-
+#Following code streams similarity results using GDS "Node Similarity" alg which is based on Jaccard
+CALL gds.nodeSimilarity.stream('Annotation_Graph')
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).Name AS Disease1, gds.util.asNode(node2).Name AS Disease2, similarity
+ORDER BY similarity DESCENDING, Disease1, Disease2
 
 
-#Cypher queries:
+#TopK for PMID Matches = 100, simCutoff 0.03
 
-
-###USING THE JACCARD SIMILARITY ALGORITHM TO FIND SIMILARITY
-#BETWEEN DISEASES
-
-#Return a list of similar diseases
-query = """MATCH (d:Disease)-[:is_annotated_in]->(pmid)
-WITH {item:id(d), categories: collect(id(pmid))} as userData
-WITH collect(userData) as data
-CALL algo.similarity.jaccard.stream(data, {similarityCutoff: 0.0})
-YIELD item1, item2, count1, count2, intersection, similarity
-RETURN algo.asNode(item1).Name AS from, algo.asNode(item2).Name AS to, intersection, similarity
-ORDER BY similarity DESC"""
-
-
-#More interesting:
-#Find the most similar disease for each disease and establish "SIMILAR"
-#relationships among them
-
-query = """
-MATCH (d:Disease)-[:is_annotated_in]->(pmid)
-WITH {item:id(d), categories: collect(id(pmid))} as userData
-WITH collect(userData) as data
-CALL algo.similarity.jaccard(data, {topK: 1, similarityCutoff: 0.1, write:true})
-YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
-RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
-
-#Next steps
-For each disease, finding "suggested" articles that they should be annotated in...
-#Find the most similar diseases to each disease, and return the articles that the similar diseases are annotated in.
-#In other words, finding the documents that do not yet have that disease annotated, but who have similar terms annotated in them already.
-"""
-
-
-
-
-MATCH(d:Disease {Name: "kd"})-[:SIMILAR]->(other),
-	(other)-[is_annotated_in]->(pmid:PMID)
-WHERE not((d)-[:is_annotated_in]->(pmid:PMID))
-RETURN pmid.PMID as PMID
-"""
-
-#INTERESTING THINGS HAPPENING WITH:
-kd
-arrhythmia
-pulmonary emboli
-
-
-------------------------------------------------------------------------------------
-#How I ended up implementing these:
-
-#First find similarity relationships for the entire database. 
-#ENDED UP USING TOPK 100 and cutoff .01, to generate a max of 100 similarity pairs for each disease
-
-query = 
-"""MATCH (d:Disease)-[:is_annotated_in]->(pmid)
-WITH {item:id(d), categories: collect(id(pmid))} as userData
-WITH collect(userData) as data
-CALL algo.similarity.jaccard(data, {topK: 100, similarityCutoff: 0.01, write:true})
-YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
-RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
-"""
-
-#Once similarity relationships are established, you can export the similarity relationships for a specific disease to
-#csv with this query:
-query = """
-MATCH (d:Disease {Name:"arrhythmia"})-[sim:SIMILAR]->(n)
-WITH collect(DISTINCT d) AS diseases, collect(DISTINCT n) AS simDiseases, collect(sim) AS simRels
-CALL apoc.export.csv.data(diseases + simDiseases, simRels, "arrhythmia-similar-diseases.csv", {})
-YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
-RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
-"""
-
-
-
+CALL gds.nodeSimilarity.write('Annotation_Graph', {similarityCutoff:0.03, topK:100, topN: 0,
+    writeRelationshipType: 'SIMILAR',
+    writeProperty: 'score'
+})
+YIELD nodesCompared, relationshipsWritten
