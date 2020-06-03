@@ -3,7 +3,7 @@
 #to run an algorithm, etc.
 
 #Step 1 is to create a graph with just the annotation relationships, and add to the catalogue.
-CALL gds.graph.create('Annotation_Graph', ['Disease', 'PMID'], 'is_annotated_in');
+CALL gds.graph.create('Annotation_Graph', ['Disease', 'Chemical','PMID'], 'is_annotated_in');
 
 #Following code streams similarity results using GDS "Node Similarity" alg which is based on Jaccard
 CALL gds.nodeSimilarity.stream('Annotation_Graph')
