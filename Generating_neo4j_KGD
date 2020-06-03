@@ -2,11 +2,21 @@
 # -*- coding: utf-8 -*-
 
 
+
+##Playing around with topK values?
+
+## Can use label propagation algorithm to cluster nodes based on their similari$
+## Create partitions based on the communities the nodes belong to and add 
+#partition property to the disease nodes that identifies the cluster they belon$
+#Then can look at a node, see its community, and ask to see all other nodes in $
+#community
+
+
 from py2neo import Graph, Node, Relationship
 
-uri = "bolt://localhost:7687"
+uri = "bolt://54.186.76.22:7687"
 user = "neo4j"
-password = "pubtator"
+password = "i-0e21a74209008d2cb"
 
 #Not sure if need secure=True
 g = Graph(uri=uri, user=user, password=password, secure = True)
@@ -26,31 +36,18 @@ g.run("CREATE CONSTRAINT ON(disease:Disease) ASSERT disease.Name IS UNIQUE")
 
 #Can write the query in cypher
 query = """
-
-
-LOAD CSV WITH HEADERS FROM 'file:////Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH2.csv' AS line
+LOAD CSV WITH HEADERS FROM 'file:///Neo4j_CSV_Import.py' AS line
 WITH line
 WHERE line.PMID IS NOT NULL
 MERGE (pmid:PMID{PMID:line.PMID})
 MERGE (mesh:MESH{MESH:line.MESH})
 MERGE (disease:Disease{Name:line.Disease})
-MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]-> (pmid)
-MERGE (disease) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]->(pmid)
+MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}$
+MERGE (disease) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotat$
 
 """
-
-#CHEMICALS:
-"""LOAD CSV WITH HEADERS FROM 'file:///batch1_chem.csv' AS line
-WITH line
-WHERE line.PMID IS NOT NULL
-MERGE (pmid:PMID{PMID:line.PMID})
-MERGE (mesh:MESH{MESH:line.MESH})
-MERGE (drug:Drug{Name:line.Chemical})
-MERGE (mesh) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]-> (pmid)
-MERGE (drug) -[:is_annotated_in{Times_Annotated:line.Number_of_Times_Annotated}]->(pmid)
 #And then use py2neo to run it
 g.run(query)
-"""
 
 
 #Test graph is now populated
@@ -58,14 +55,13 @@ print(len(g.nodes))
 print(len)
 
 
-
 sim_alg = """
 MATCH (d:Disease)-[:is_annotated_in]->(pmid)
 WITH {item:id(d), categories: collect(id(pmid))} as userData
 WITH collect(userData) as data
-CALL algo.similarity.jaccard(data, {topK: 1, similarityCutoff: 0.1, write:true})
-YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
-RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
+CALL algo.similarity.jaccard(data, {topK: 0, similarityCutoff: 0.1, write:true})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min,$
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min$
 
 """
 
