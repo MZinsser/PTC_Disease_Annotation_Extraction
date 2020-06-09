@@ -28,7 +28,7 @@ g.run("CREATE CONSTRAINT ON(disease:Disease) ASSERT disease.Name IS UNIQUE")
 query = """
 
 
-LOAD CSV WITH HEADERS FROM 'file:////Users/marleezinsser/opt/anaconda3/lib/python3.7/site-packages/neo4j/import/PMID-MESH2.csv' AS line
+LOAD CSV WITH HEADERS FROM 'file:///batch1_dis.csv' AS line
 WITH line
 WHERE line.PMID IS NOT NULL
 MERGE (pmid:PMID{PMID:line.PMID})
